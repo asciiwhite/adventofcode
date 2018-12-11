@@ -1,0 +1,9 @@
+[package]
+name = "day04"
+version = "0.1.0"
+authors = ["Christian Vix <christian_vix@mentor.com>"]
+edition = "2018"
+
+[dependencies]
+regex = "1"
+chrono = "0.4"
