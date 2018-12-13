@@ -75,13 +75,9 @@ fn main()
            GuardAction::BeginShift(guard) => activeGuard = guard,
            GuardAction::WakeUp => {
 //                println!("guard {} sleeping from {} till {}", activeGuard, startSleepingMinute, event.time.minute());
-                if !guardMinutes.contains_key(&activeGuard) {
-                    guardMinutes.insert(activeGuard, GuardMinutes::new());
-                }
-                
-                let slice = &mut guardMinutes.get_mut(&activeGuard).unwrap().minutes;
+                let entry = guardMinutes.entry(activeGuard).or_insert(GuardMinutes::new());
                 for i in startSleepingMinute..event.time.minute() {
-                    slice[i as usize] += 1;
+                    entry.minutes[i as usize] += 1;
                 }
            },
            GuardAction::FallAsleep => startSleepingMinute = event.time.minute(),
