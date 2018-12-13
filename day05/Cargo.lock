@@ -1,4 +1,14 @@
 [[package]]
 name = "day05"
 version = "0.1.0"
+dependencies = [
+ "unic-char-range 0.7.0 (registry+https://github.com/rust-lang/crates.io-index)",
+]
 
+[[package]]
+name = "unic-char-range"
+version = "0.7.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+
+[metadata]
+"checksum unic-char-range 0.7.0 (registry+https://github.com/rust-lang/crates.io-index)" = "d9ab85fab42ad1b26cafc03bf891f69cb4d6e15f491030e89a0122197baa8ae8"
