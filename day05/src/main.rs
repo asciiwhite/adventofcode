@@ -64,7 +64,8 @@ fn main()
     for char in CharRange::closed('a', 'z') {
         let lower = char as u8;
         let upper = lower - CASE_DIFF as u8;
-        let shortPolymer = reducedPolymer.iter().cloned().filter_map(|c| if initialChars[c] != lower && initialChars[c] != upper { Some(initialChars[c]) } else { None }).collect::<Vec<u8>>();
+        let charCheck = |c| match initialChars[c] != lower && initialChars[c] != upper { true => Some(initialChars[c]), false => None };
+        let shortPolymer = reducedPolymer.iter().cloned().filter_map(|c| charCheck(c)).collect::<Vec<u8>>();
         let furtherReducedPolymer = reducePolymer(shortPolymer.as_slice());
         println!("polymer length without '{},{}' from {} to {}", lower as char, upper as char, shortPolymer.len(), furtherReducedPolymer.len());
         minLength = cmp::min(furtherReducedPolymer.len(), minLength);
