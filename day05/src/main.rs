@@ -5,7 +5,7 @@ use std::cmp;
 
 const CASE_DIFF: i32 = 32; //('A' as i32 - 'a' as i32).abs();
 
-fn react(first: u8, second: u8) -> bool
+fn reactPair(first: u8, second: u8) -> bool
 {
     (first as i32 - second as i32).abs() == CASE_DIFF
 }
@@ -17,20 +17,14 @@ fn getNextPairAfterReaction(first: &mut usize, second: &mut usize, candidates: &
         *second += 2;
     }
     else {
-        if candidates.is_empty() {
-            *first = *second;
-//          println!("no candidate found {}", *first);
-        }
-        else {
-            *first = candidates.pop().unwrap();
-//          println!("found candidate {}", *first);
-        }
-        if *second == lastIndex {
-            *second = cmp::max(*first, 0);
-        }
-        else {
-            *second += 1;
-        }
+        *first = match candidates.pop() {
+            None => *second,
+            Some(cand) => cand,
+        };
+        *second = match *second == lastIndex {
+            true => cmp::max(*first, 0),
+            false => *second + 1,
+        };
     }
 }
 
@@ -47,9 +41,8 @@ fn main()
     let filename = "input.txt";
     let contents = fs::read_to_string(filename).expect("Something went wrong reading the file");
     let lastIndex = contents.len() - 1;
-    let mut polymerLength = contents.len();
     
-    println!("initial polymer length: {}", polymerLength);
+    println!("initial polymer length: {}", contents.len());
     
     let mut first = 0;
     let mut second = 1;
@@ -61,15 +54,10 @@ fn main()
         assert!(second <= lastIndex);
         assert!(first != second);
 
-        if react(chars[first], chars[second]) {
-//            println!("found reaction: {}:{} {}:{}", first, second, chars[first] as char, chars[second] as char);
-            getNextPairAfterReaction(&mut first, &mut second, &mut candidates, lastIndex);
-            polymerLength -= 2;
-        }
-        else {
-            getNextPairWithoutReaction(&mut first, &mut second, &mut candidates);
-        }
-//        println!("new indices: {}:{}", first, second);
+        match reactPair(chars[first], chars[second]) {
+            true  => getNextPairAfterReaction(&mut first, &mut second, &mut candidates, lastIndex),
+            false => getNextPairWithoutReaction(&mut first, &mut second, &mut candidates),
+        };
     };    
-    println!("final polymer length: {}", polymerLength);
+    println!("final polymer length: {}", candidates.len() + 1);
 }
