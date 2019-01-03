@@ -5,4 +5,4 @@ authors = ["Christian Vix <christian_vix@mentor.com>"]
 edition = "2018"
 
 [dependencies]
-regex = "1"
+text_io = "0.1.7"

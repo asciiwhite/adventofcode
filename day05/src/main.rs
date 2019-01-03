@@ -2,13 +2,10 @@
 
 use std::fs;
 use std::cmp;
-use unic_char_range::CharRange;
 
-const CASE_DIFF: i32 = 32; //('A' as i32 - 'a' as i32).abs();
-
-fn reactPair(first: u8, second: u8) -> bool
+fn reactPair(first: char, second: char) -> bool
 {
-    (first as i32 - second as i32).abs() == CASE_DIFF
+    first.eq_ignore_ascii_case(&second) && first != second
 }
 
 fn getNextPair(reaction: bool, first: &mut usize, second: &mut usize, candidates: &mut Vec<usize>, lastIndex: usize)
@@ -45,7 +42,7 @@ fn reducePolymer(polymer: &[u8]) -> Vec<usize>
     let mut candidates: Vec<usize> = Vec::new();
     
     while second <= lastIndex {
-        getNextPair(reactPair(polymer[first], polymer[second]), &mut first, &mut second, &mut candidates, lastIndex);
+        getNextPair(reactPair(polymer[first] as char, polymer[second] as char), &mut first, &mut second, &mut candidates, lastIndex);
     };
     candidates.push(second-1);
     candidates
@@ -60,15 +57,14 @@ fn main()
     let reducedPolymer = reducePolymer(initialChars);    
     println!("initial polymer length from {} to {}", initialChars.len(), reducedPolymer.len());
 
-    let mut minLength = reducedPolymer.len();
-    for char in CharRange::closed('a', 'z') {
-        let lower = char as u8;
-        let upper = lower - CASE_DIFF as u8;
-        let charCheck = |c| match initialChars[c] != lower && initialChars[c] != upper { true => Some(initialChars[c]), false => None };
-        let shortPolymer = reducedPolymer.iter().cloned().filter_map(|c| charCheck(c)).collect::<Vec<u8>>();
+    let minLength = (b'a'..b'z').map(|unused_char| 
+    {
+        let charCheck = |c: u8| match !c.eq_ignore_ascii_case(&unused_char) { true => Some(c), false => None };
+        let shortPolymer = reducedPolymer.iter().cloned().filter_map(|c| charCheck(initialChars[c])).collect::<Vec<u8>>();
         let furtherReducedPolymer = reducePolymer(shortPolymer.as_slice());
-        println!("polymer length without '{},{}' from {} to {}", lower as char, upper as char, shortPolymer.len(), furtherReducedPolymer.len());
-        minLength = cmp::min(furtherReducedPolymer.len(), minLength);
-    }
-   println!("shortest polymer length: {}", minLength);
+        println!("polymer length without '{},{}' from {} to {}", unused_char, unused_char.to_ascii_uppercase(), shortPolymer.len(), furtherReducedPolymer.len());
+        furtherReducedPolymer.len()
+    }).min().unwrap();
+    
+    println!("shortest polymer length: {}", minLength);
 }

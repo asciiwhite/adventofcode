@@ -1,7 +1,9 @@
 #![allow(non_snake_case)]
 
+#[macro_use]
+extern crate text_io;
+
 use std::fs;
-use regex::Regex;
 
 static mut MAP: [[usize; 1000]; 1000] = [[0; 1000]; 1000];
 static mut CLAIMS: [bool; 1287] = [false; 1287];
@@ -32,17 +34,15 @@ fn main() {
     let filename = "././input.txt";
     let contents = fs::read_to_string(filename).expect("Something went wrong reading the file");
     
-    let re = Regex::new(r"#(\d{1,}) @ (\d{1,}),(\d{1,}): (\d{1,})x(\d{1,})").unwrap();
     let mut squaresInMoreThanOneClaim = 0;
     for line in contents.lines() {
-        let cap = re.captures_iter(line).next().unwrap();
-//        println!("id:{} pos: {}x{} size: {}x{}", &cap[1], &cap[2], &cap[3], &cap[4], &cap[5]);
-        squaresInMoreThanOneClaim += insertInMap(
-            cap[1].parse::<usize>().unwrap(),
-            cap[2].parse::<u32>().unwrap(),
-            cap[3].parse::<u32>().unwrap(),
-            cap[4].parse::<u32>().unwrap(),
-            cap[5].parse::<u32>().unwrap());
+        let id: usize;
+        let x: u32;
+        let y: u32;
+        let w: u32;
+        let h: u32;
+        scan!(line.bytes() => "#{} @ {},{}: {}x{}", id, x, y, w, h);
+        squaresInMoreThanOneClaim += insertInMap(id, x, y, w, h);
     }
     println!("num square inches: {}", squaresInMoreThanOneClaim);
     

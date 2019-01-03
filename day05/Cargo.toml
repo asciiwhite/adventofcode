@@ -5,4 +5,3 @@ authors = ["Christian Vix <christian_vix@mentor.com>"]
 edition = "2018"
 
 [dependencies]
-unic-char-range = "0.7"
