@@ -14,22 +14,18 @@ fn parseNode(iter: &mut std::slice::Iter<usize>) -> usize {
     metaDataSum
 }
 
-fn nextEntry(entries: &Vec<usize>, id: &mut usize) -> usize {
-    let res = entries[*id];
-    *id += 1;
-    res
-}
-
-fn valueOfNode(entries: &Vec<usize>, entryId: &mut usize) -> usize {
-    let childCount = nextEntry(entries, entryId);
-    let metaDataCount = nextEntry(entries, entryId);
-    let childValues: Vec<_> = (0..childCount).map(|_| valueOfNode(entries, entryId)).collect();
+fn valueOfNode(entries: &mut &[usize]) -> usize {
+    let childCount = entries[0];
+    let metaDataCount = entries[1];
+    *entries = &entries[2..];
+    let childValues: Vec<_> = (0..childCount).map(|_| valueOfNode(entries)).collect();
     let metaDataSum = if childValues.is_empty() {
-        (0..metaDataCount).map(|_| nextEntry(entries, entryId)).sum::<usize>()
+        entries[0..metaDataCount].iter().sum::<usize>()
     }
     else {
-        (0..metaDataCount).filter_map(|_| childValues.get(nextEntry(entries, entryId) - 1)).sum::<usize>()
+        entries[0..metaDataCount].iter().filter_map(|c| childValues.get(c - 1)).sum::<usize>()
     };
+    *entries = &entries[metaDataCount..];
     metaDataSum
 }
 
@@ -40,8 +36,7 @@ fn parseTree(content: &str) {
     let metaDataSum = parseNode(&mut iter);
     println!("Sum of metadata: {} ", metaDataSum);
 
-    let mut rootId = 0;
-    let valueOfRootNode = valueOfNode(&entries, &mut rootId);
+    let valueOfRootNode = valueOfNode(&mut &entries[..]);
     println!("Value of rootNode: {} ", valueOfRootNode);
 }
 
